@@ -24,6 +24,10 @@ branches:
     - master
 
 before_install:
+  - wget https://dl.dropboxusercontent.com/u/7897865/apache-maven-3.3.9.zip
+  - unzip -qq apache-maven-3.3.9.zip
+  - export M2_HOME=$PWD/apache-maven-3.3.9
+  - export PATH=$M2_HOME/bin:$PATH
   # Comment gradle build command to use maven and vice versa
   - wget http://services.gradle.org/distributions/gradle-2.7-bin.zip
   - unzip -qq gradle-2.7-bin.zip
