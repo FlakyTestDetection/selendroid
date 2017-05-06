@@ -1,56 +1,39 @@
-language: android
 android:
   components:
-    - build-tools-23.0.2
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - android-16
-    - sysimg-16
+  - build-tools-23.0.2
+  - extra-google-m2repository
+  - extra-android-m2repository
+  - android-16
+  - sysimg-16
   licences:
-    - android-sdk-license-bcbbd656
-    - '.*intel.+'
-
-notifications:
-  email: false
-  irc:
-    channels:
-      - "irc.freenode.org#selendroid"
-    on_success: always
-    on_failure: always
-    use_notice: true
-  
+  - android-sdk-license-bcbbd656
+  - .*intel.+
+before_install:
+- wget https://dl.dropboxusercontent.com/u/7897865/apache-maven-3.3.9.zip
+- unzip -qq apache-maven-3.3.9.zip
+- export M2_HOME=$PWD/apache-maven-3.3.9
+- export PATH=$M2_HOME/bin:$PATH
+- wget http://services.gradle.org/distributions/gradle-2.7-bin.zip
+- unzip -qq gradle-2.7-bin.zip
+- export GRADLE_HOME=$PWD/gradle-2.7
+- export PATH=$GRADLE_HOME/bin:$PATH
+- git clone -b travis `git config --get remote.origin.url` target/travis
+before_script:
+- echo no | android create avd --force -n l10n -t android-16 --abi armeabi-v7a
 branches:
   only:
-    - master
-
-before_install:
-  - wget https://dl.dropboxusercontent.com/u/7897865/apache-maven-3.3.9.zip
-  - unzip -qq apache-maven-3.3.9.zip
-  - export M2_HOME=$PWD/apache-maven-3.3.9
-  - export PATH=$M2_HOME/bin:$PATH
-  # Comment gradle build command to use maven and vice versa
-  - wget http://services.gradle.org/distributions/gradle-2.7-bin.zip
-  - unzip -qq gradle-2.7-bin.zip
-  - export GRADLE_HOME=$PWD/gradle-2.7
-  - export PATH=$GRADLE_HOME/bin:$PATH
-  - "git clone -b travis `git config --get remote.origin.url` target/travis"
-
-  # Maven
-  # - "mvn --version"
-  # - "cd third-party/"
-  # - "./mvnInstall.sh"
-  # - "cd ../"
-
-before_script:
-  - echo no | android create avd --force -n l10n -t android-16 --abi armeabi-v7a
-
-script: 
-  - "gradle clean build"
-
-  # Maven
-  #  - "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && mvn clean deploy --settings target/travis/settings.xml || mvn clean verify --settings target/travis/settings.xml"
-
+  - master
 env:
   global:
-    - secure: "qOCTIN+N9lYVx/rp7Qu5xcyaFPLsf64UYSOY5dq+4jOx5vokQfb0vwFxKyDJcUD7ow3GMhw11280HE2OZ3Xk+1xRGWND5Axhey8BPOjqT9D+vjKY2o2Q2ZmUbBTapL/lDixjnV9Gk/bJLytPLNaaA7S/HNfp0g03bWhLanz5fgg="
-    - secure: "BzwsXUidLx7X733KzZDwvuXsIiFD0WazDABk8FM3BuvkJnGd8xp84A0ZwZ76PYvrxWp/MncyaOytkrnNA86rnBmpWvcnWzEuBVoDY/cEc4q1SnLjgsRByanNBPoYopFHAVRI2zvkU8hSBVFZC2+ABi3vpNhgYr0LtBhZouBTX5E="
+  - secure: qOCTIN+N9lYVx/rp7Qu5xcyaFPLsf64UYSOY5dq+4jOx5vokQfb0vwFxKyDJcUD7ow3GMhw11280HE2OZ3Xk+1xRGWND5Axhey8BPOjqT9D+vjKY2o2Q2ZmUbBTapL/lDixjnV9Gk/bJLytPLNaaA7S/HNfp0g03bWhLanz5fgg=
+  - secure: BzwsXUidLx7X733KzZDwvuXsIiFD0WazDABk8FM3BuvkJnGd8xp84A0ZwZ76PYvrxWp/MncyaOytkrnNA86rnBmpWvcnWzEuBVoDY/cEc4q1SnLjgsRByanNBPoYopFHAVRI2zvkU8hSBVFZC2+ABi3vpNhgYr0LtBhZouBTX5E=
+language: android
+notifications:
+  email: false
+  slack:
+    rooms: flakycov:U2MeVOPjdi4up1U793ubeIUZ
+    template:
+    - Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository}@%{branch} by %{author} %{result} in %{duration}
+    - 'dashbot: %{repository_name} %{build_id}'
+script:
+- gradle clean build
